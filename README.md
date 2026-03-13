@@ -1,7 +1,8 @@
 # UWA Venue Finder
 
 A fast terminal tool for fuzzy-searching UWA venue codes. Type a few characters and it instantly narrows down the list. Hit Enter and the venue code is copied to your clipboard.
-<video src="https://github.com/TrystanScottLambert/venue_lookup/raw/main/venue_lookup.mp4" autoplay loop muted playsinline></video>
+
+
 
 ## Install
 
