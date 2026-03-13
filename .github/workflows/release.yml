@@ -15,16 +15,16 @@ jobs:
         include:
           - target: x86_64-apple-darwin
             os: macos-latest
-            name: uwa-venue-finder-macos-x86_64
+            name: venue_lookup-macos-x86_64
           - target: aarch64-apple-darwin
             os: macos-latest
-            name: uwa-venue-finder-macos-arm64
+            name: venue_lookup-macos-arm64
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
-            name: uwa-venue-finder-linux-x86_64
+            name: venue_lookup-linux-x86_64
           - target: x86_64-pc-windows-msvc
             os: windows-latest
-            name: uwa-venue-finder-windows-x86_64
+            name: venue_lookup-windows-x86_64
 
     runs-on: ${{ matrix.os }}
 
@@ -43,14 +43,14 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           cd target/${{ matrix.target }}/release
-          tar czf ../../../${{ matrix.name }}.tar.gz uwa-venue-finder
+          tar czf ../../../${{ matrix.name }}.tar.gz venue_lookup
           cd ../../..
 
       - name: Package (windows)
         if: runner.os == 'Windows'
         run: |
           cd target/${{ matrix.target }}/release
-          7z a ../../../${{ matrix.name }}.zip uwa-venue-finder.exe
+          7z a ../../../${{ matrix.name }}.zip venue_lookup.exe
           cd ../../..
 
       - name: Upload artifact
