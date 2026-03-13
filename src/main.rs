@@ -1,4 +1,4 @@
-use std::io::{self, Write, stdin, stdout};
+use std::io::{Write, stdin, stdout};
 
 /// Simple fuzzy match: checks if all characters in the pattern appear
 /// in order in the target (case-insensitive). Returns a score (lower = better)
