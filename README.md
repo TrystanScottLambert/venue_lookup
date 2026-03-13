@@ -2,7 +2,7 @@
 
 A fast terminal tool for fuzzy-searching UWA venue codes. Type a few characters and it instantly narrows down the list. Hit Enter and the venue code is copied to your clipboard.
 
-
+![Demo](venue_lookup.gif)
 
 ## Install
 
