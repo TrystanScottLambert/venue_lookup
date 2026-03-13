@@ -972,21 +972,19 @@ fn run_loop(query: &mut String) -> Option<(String, String)> {
             27 => {
                 // Escape sequence — read the next two bytes
                 let mut seq = [0u8; 2];
-                if stdin().read_exact(&mut seq).is_ok() {
-                    if seq[0] == b'[' {
-                        match seq[1] {
-                            b'A' => {
-                                // Up arrow
-                                selected = selected.saturating_sub(1);
-                            }
-                            b'B' => {
-                                // Down arrow
-                                if !matches.is_empty() && selected < matches.len() - 1 {
-                                    selected += 1;
-                                }
-                            }
-                            _ => {}
+                if stdin().read_exact(&mut seq).is_ok() && seq[0] == b'[' {
+                    match seq[1] {
+                        b'A' => {
+                            // Up arrow
+                            selected = selected.saturating_sub(1);
                         }
+                        b'B' => {
+                            // Down arrow
+                            if !matches.is_empty() && selected < matches.len() - 1 {
+                                selected += 1;
+                            }
+                        }
+                        _ => {}
                     }
                 }
             }
