@@ -1,4 +1,4 @@
-use std::io::{Write, stdin, stdout};
+use std::io::{self, Write, stdin, stdout};
 
 /// Simple fuzzy match: checks if all characters in the pattern appear
 /// in order in the target (case-insensitive). Returns a score (lower = better)
@@ -46,6 +46,7 @@ fn fuzzy_score(pattern: &str, target: &str) -> Option<i32> {
         None
     }
 }
+
 const VENUES: &[(&str, &str)] = &[
     (
         "103.G01",
@@ -790,13 +791,82 @@ fn main() {
     clear_screen();
 
     if let Some((code, _name)) = result {
-        // Copy to clipboard via OSC 52 (works in most modern terminals)
-        use std::io::Write;
-        let b64 = base64_encode(code.as_bytes());
-        print!("\x1b]52;c;{b64}\x07");
-        let _ = stdout().flush();
-        println!("\x1b[1;33m{code}\x1b[0m copied to clipboard");
+        let copied = copy_to_clipboard(&code);
+        if copied {
+            println!("\x1b[1;33m{code}\x1b[0m copied to clipboard");
+        } else {
+            println!("\x1b[1;33m{code}\x1b[0m");
+            println!("\x1b[90m(could not copy to clipboard automatically)\x1b[0m");
+        }
     }
+}
+
+fn copy_to_clipboard(text: &str) -> bool {
+    use std::process::{Command, Stdio};
+
+    // macOS: pbcopy
+    if let Ok(mut child) = Command::new("pbcopy")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            let _ = stdin.write_all(text.as_bytes());
+        }
+        return child.wait().map(|s| s.success()).unwrap_or(false);
+    }
+
+    // Linux (X11): xclip
+    if let Ok(mut child) = Command::new("xclip")
+        .args(["-selection", "clipboard"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            let _ = stdin.write_all(text.as_bytes());
+        }
+        return child.wait().map(|s| s.success()).unwrap_or(false);
+    }
+
+    // Linux (X11) alt: xsel
+    if let Ok(mut child) = Command::new("xsel")
+        .args(["--clipboard", "--input"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            let _ = stdin.write_all(text.as_bytes());
+        }
+        return child.wait().map(|s| s.success()).unwrap_or(false);
+    }
+
+    // Linux (Wayland): wl-copy
+    if let Ok(mut child) = Command::new("wl-copy")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    {
+        if let Some(mut stdin) = child.stdin.take() {
+            use std::io::Write;
+            let _ = stdin.write_all(text.as_bytes());
+        }
+        return child.wait().map(|s| s.success()).unwrap_or(false);
+    }
+
+    // Fallback: OSC 52 (works in iTerm2, kitty, alacritty, WezTerm, Windows Terminal)
+    let b64 = base64_encode(text.as_bytes());
+    print!("\x1b]52;c;{b64}\x07");
+    let _ = stdout().flush();
+    true
 }
 
 fn base64_encode(input: &[u8]) -> String {
