@@ -1,4 +1,4 @@
-use std::io::{self, Write, stdin, stdout};
+use std::io::{Write, stdin, stdout};
 
 /// Simple fuzzy match: checks if all characters in the pattern appear
 /// in order in the target (case-insensitive). Returns a score (lower = better)
@@ -977,9 +977,7 @@ fn run_loop(query: &mut String) -> Option<(String, String)> {
                         match seq[1] {
                             b'A' => {
                                 // Up arrow
-                                if selected > 0 {
-                                    selected -= 1;
-                                }
+                                selected = selected.saturating_sub(1);
                             }
                             b'B' => {
                                 // Down arrow
